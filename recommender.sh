@@ -1,0 +1,34 @@
+#########################################################################
+# File Name: recommender.sh
+# Author: shengzhao
+# mail: zhaosheng0509@gmail.com
+# Created Time: Mon 14 Jan 2013 02:13:25 PM CST
+#########################################################################
+#!/bin/bash
+
+if [ $# -lt 1 ] ; then
+cat << HELP
+	This is a help notification
+HELP
+exit 0
+fi
+
+# define the const variable
+MahoutHomeJar_Dir=/home/hadoop/workspace/mahout-distribution-0.5/core/target/mahout-core-0.5-job.jar
+MahoutJobName=org.apache.mahout.cf.taste.hadoop.item.RecommenderJob
+
+# cd the work dir
+cd ${HADOOP_HOME}
+
+# upload the data
+da=$(date +'%Y%m%d%H%M%S')
+InputDir=input${da}
+if [ -f "${InputDir}" ]; then
+	bin/hadoop dfs -rmr ${InputDir}
+fi
+bin/hadoop dfs -put $1 ${InputDir}
+
+# start mahout hadoop Job
+OutputDir=output${da}
+TempDir=temp${da}
+bin/hadoop jar ${MahoutHomeJar_Dir} ${MahoutJobName} -Dmapred.input.dir=${InputDir} -Dmapred.output.dir=${OutputDir} -Dmapred.temp.dir=${TempDir}
