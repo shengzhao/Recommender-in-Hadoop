@@ -8,7 +8,7 @@
 
 if [ $# -lt 1 ] ; then
 cat << HELP
-	This is a help notification
+	Please input the input dir
 HELP
 exit 0
 fi
