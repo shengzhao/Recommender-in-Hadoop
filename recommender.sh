@@ -19,16 +19,18 @@ MahoutJobName=org.apache.mahout.cf.taste.hadoop.item.RecommenderJob
 
 # cd the work dir
 cd ${HADOOP_HOME}
+bin/start-all.sh
 
 # upload the data
 da=$(date +'%Y%m%d%H%M%S')
 InputDir=input${da}
+TempDir=temp
 if [ -f "${InputDir}" ]; then
-	bin/hadoop dfs -rmr ${InputDir}
+	bin/hadoop dfs -rmr /user/hadoop/${InputDir}
 fi
+bin/hadoop dfs -rmr ${TempDir}
 bin/hadoop dfs -put $1 ${InputDir}
 
 # start mahout hadoop Job
 OutputDir=output${da}
-TempDir=temp${da}
-bin/hadoop jar ${MahoutHomeJar_Dir} ${MahoutJobName} -Dmapred.input.dir=${InputDir} -Dmapred.output.dir=${OutputDir} -Dmapred.temp.dir=${TempDir}
+bin/hadoop jar ${MahoutHomeJar_Dir} ${MahoutJobName} -Dmapred.input.dir=${InputDir} -Dmapred.output.dir=${OutputDir}
