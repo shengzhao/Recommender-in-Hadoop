@@ -1,0 +1,30 @@
+<script>
+	function sm1()
+	{
+		document.getElementById("form_1").action="add";
+		document.getElementById("form_1").submit();
+	}
+	function sm2()
+	{
+		document.getElementById("form_1").action="add_ano";
+		document.getElementById("form_1").submit();
+	}
+</script>
+<form action="" method=POST name=form_1 id=form_1>
+	<table id="login">
+		<tr>
+			<td>User: </td>
+			<td><input type=text name=name></td>
+			</tr>
+		<tr>																            <td>Password: </td>
+			<td><input type="password" name=passwd></td>
+		</tr>
+		<tr>
+			<td></td>
+			<td><input type=button value=LOGIN onclick="sm1()"></td>
+		</tr>
+		<tr>
+			<td></td>
+			<td><input type=button value=REGISTER onclick="sm2()"></td>
+   </table>
+</form>
