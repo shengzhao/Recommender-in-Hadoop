@@ -9,8 +9,12 @@ urls =  (
 		'/', 'index',
 		'/login', 'login',
 		'/add', 'add',
+		'/add_ano', 'add_ano',
+		'/register', 'register',
+		'/register_add', 'register_add',
 		'/reset', 'reset',
 		'/logout', 'logout',
+		'/login_success', 'login_success',
 		)
 app = web.application(urls, globals())
 
@@ -34,14 +38,35 @@ def LoginJudge(name, password):
 	else:
 		return False
 
+def RegisterJudge(name, pw, email, privilege):
+	sequence_id = db.insert('example_users', user = name, password = pw, email = email, privilege = privilege)
+	return True
+def LoginCookie():
+	try:
+		a = web.cookies()
+		web.debug(a)
+		name = web.cookies().username
+		password = web.cookies().password
+		web.debug(name)
+		web.debug(password)
+		if LoginJudge(name, password):
+			return True
+		else:
+			return False
+	except:
+		web.debug("cookie expire")
+		return False
+
 class index:
 	def GET(self):
+		web.debug("index")
 		raise web.seeother('/login')
 
 class login:
 	def GET(self):
-		if logged():
-			return render.login_suc()
+		if logged() or LoginCookie():
+#			return render.login_suc()
+			raise web.seeother('/login_success')
 		else:
 			return render.login()
 
@@ -50,9 +75,36 @@ class add:
 		name, passwd = web.input().name, web.input().passwd
 		if LoginJudge(name, passwd):
 			session.login = 1
-			return render.login_suc()
+#			return render.login_suc()
+			raise web.seeother('/login_success')
 		else:
-			raise web.seeother('login')
+			raise web.seeother('/login')
+
+class add_ano:
+	def POST(self):
+		raise web.seeother('/register')
+
+class register:
+	def GET(self):
+		return render.register()
+
+class register_add:
+	def POST(self):
+		name, pw, email, privilege = web.input().name, web.input().pw, web.input().email, web.input().privilege
+		if RegisterJudge(name, pw, email, privilege):
+			web.debug(name)
+			web.setcookie('username', name, 60)
+			web.setcookie('password', pw, 60)
+			a = web.cookies()
+			web.debug(a)
+#			return render.login_suc()
+			raise web.seeother('/login_success')
+		else:
+			raise web.seeother('/register')
+
+class login_success:
+	def GET(self):
+		return render.login_suc()
 
 if __name__ == "__main__":
 #	web.wsgi.runwsgi = lambda func, addr = None: web.wsgi.runfcgi(func, addr)
