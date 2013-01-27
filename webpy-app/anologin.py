@@ -75,6 +75,9 @@ class add:
 		name, passwd = web.input().name, web.input().passwd
 		if LoginJudge(name, passwd):
 			session.login = 1
+			# record the cookie
+			web.setcookie('username', name, 60)
+			web.setcookie('password', passwd, 60)
 #			return render.login_suc()
 			raise web.seeother('/login_success')
 		else:
@@ -101,6 +104,13 @@ class register_add:
 			raise web.seeother('/login_success')
 		else:
 			raise web.seeother('/register')
+
+class logout:
+	def GET(self):
+		web.setcookie('username', "", -1)
+		web.setcookie('password', "", -1)
+		session.kill()
+		raise web.seeother('/login')
 
 class login_success:
 	def GET(self):

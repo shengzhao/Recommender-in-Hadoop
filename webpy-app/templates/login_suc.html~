@@ -3,7 +3,7 @@
 		<script>
 			function func()
 			{
-				document.getElementById("form").action="logout";
+				document.getElementById("form").action="logout_add";
 				document.getElementById("form").submit();
 			}
 		</script>
@@ -13,7 +13,7 @@
 			Login Success!
 		</tr>
 		<form action="" name=form id=form methon=POST>
-			<input type=button value=logout onclick="func()">
+			<a href="" onclick="func()">log out</a>
 		</form>
 </html>
 
