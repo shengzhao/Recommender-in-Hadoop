@@ -1,8 +1,11 @@
 <script>
 	function sm1()
 	{
-		document.getElementById("form_1").action="add";
-		document.getElementById("form_1").submit();
+		if(validate_form("form_1"))
+		{
+			document.getElementById("form_1").action="add";
+			document.getElementById("form_1").submit();
+		}
 	}
 	function sm2()
 	{
@@ -43,7 +46,7 @@
 	{
 		with(field)
 		{
-			if(value.length<=6)
+			if(value.length<6)
 			{
 				alert(alerttxt);
 				return false;
@@ -54,25 +57,28 @@
 	}
 	function validate_form(thisform)
 	{
-		if(validate_username(name,"please input validate username!")==false)
+		with(thisform)
+		if(validate_username(user,"please input validate username!")==false)
 		{
-			name.focus();
+			user.focus();
 			return false;
 		}
-		else if(validate_password(passwd, "the length of password should be at least 6"))
+		else if(validate_password(password, "the length of password should be at least 6")==false)
 		{
-			passwd.focus();
+			password.focus();
 			return false;
 		}
+		else return true;
 	}
 </script>
-<form action="" method=POST onsubmit="return validate_form(this);" name=form_1 id=form_1>
+<form action="" method=POST  name=form_1 id=form_1>
 	<table id="login">
 		<tr>
 			<td>User: </td>
 			<td><input type=text name=name id="user"></td>
 			</tr>
-		<tr>																            <td>Password: </td>
+		<tr>																           
+			<td>Password: </td>
 			<td><input type="password" name=passwd id="password"></td>
 		</tr>
 		<tr>
