@@ -1,0 +1,19 @@
+<html>
+	<head>
+		<script>
+			function func()
+			{
+				document.getElementById("form").action="logout";
+				document.getElementById("form").submit();
+			}
+		</script>
+	</head>
+	<body>
+		<tr>
+			Login Success!
+		</tr>
+		<form action="" name=form id=form methon=POST>
+			<input type=button value=logout onclick="func()">
+		</form>
+</html>
+
