@@ -1,0 +1,92 @@
+<script>
+	function sm1()
+	{
+		if(validate_form("form_1"))
+		{
+			document.getElementById("form_1").action="add";
+			document.getElementById("form_1").submit();
+		}
+	}
+	function sm2()
+	{
+		document.getElementById("form_1").action="add_ano";
+		document.getElementById("form_1").submit();
+	}
+	function validate_email(field,alerttxt)
+	{
+		with(field)
+		{
+			apos=value.indexOf("@");
+			dotpos=value.lastIndexOf(".");
+			if(apos<1 || dotpos-apos<2)
+			{
+				alert(alerttxt);
+				return false;
+			}
+			else
+			{
+				return true;
+			}
+		}
+	}
+	function validate_username(field,alerttxt)
+	{
+		with(field)
+		{
+			if(value.length==0)
+			{
+				alert(alerttxt);
+				return false;
+			}
+			else
+				return true;
+		}
+	}
+	function validate_password(field,alerttxt)
+	{
+		with(field)
+		{
+			if(value.length<6)
+			{
+				alert(alerttxt);
+				return false;
+			}
+			else
+				return true;
+		}
+	}
+	function validate_form(thisform)
+	{
+		with(thisform)
+		if(validate_username(user,"please input validate username!")==false)
+		{
+			user.focus();
+			return false;
+		}
+		else if(validate_password(password, "the length of password should be at least 6")==false)
+		{
+			password.focus();
+			return false;
+		}
+		else return true;
+	}
+</script>
+<form action="" method=POST  name=form_1 id=form_1>
+	<table id="login">
+		<tr>
+			<td>User: </td>
+			<td><input type=text name=name id="user"></td>
+			</tr>
+		<tr>																           
+			<td>Password: </td>
+			<td><input type="password" name=passwd id="password"></td>
+		</tr>
+		<tr>
+			<td></td>
+			<td><input type=button value=LOGIN onclick="sm1()"></td>
+		</tr>
+		<tr>
+			<td></td>
+			<td><input type=button value=REGISTER onclick="sm2()"></td>
+   </table>
+</form>
