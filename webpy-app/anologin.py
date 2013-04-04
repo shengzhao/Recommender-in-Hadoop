@@ -18,7 +18,7 @@ urls =  (
 		)
 app = web.application(urls, globals())
 
-render = web.template.render('/home/hadoop/git/webpy-app/templates')
+render = web.template.render('/home/hadoop/git/Recommender-in-Hadoop/webpy-app/templates')
 
 session = web.session.Session(app, web.session.DiskStore('sessions'), initializer={'login': 0})
 
@@ -60,6 +60,7 @@ def LoginCookie():
 class index:
 	def GET(self):
 		web.debug("index")
+#		return {'message': 'Hello', 'name': 'zhaosheng'}
 		raise web.seeother('/login')
 
 class login:
