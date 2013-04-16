@@ -37,8 +37,6 @@ class query:
 			return "please give userId"
 		except exceptions.IndexError:
 			return "we haven't record this userId"
-		if recommender is None:
-			return
 		b = recommender.split(',')
 		result = []
 		for dictionary in b:

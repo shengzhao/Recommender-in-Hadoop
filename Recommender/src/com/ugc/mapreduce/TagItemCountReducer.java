@@ -1,7 +1,9 @@
 package com.ugc.mapreduce;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.Reducer.Context;
@@ -19,17 +21,31 @@ public class TagItemCountReducer extends
 	public static final Logger log = LoggerFactory.getLogger(TagUserCountReducer.class);
 	
 	protected void reduce(VarIntWritable key, Iterable<VectorWritable> value, Context context) throws IOException, InterruptedException {
-		//int sum = 0;
+		int sum = 0;
 		Vector resultvector = new RandomAccessSparseVector(Integer.MAX_VALUE, 1000);
-		for(VectorWritable vector : value) {			
+		List<VectorWritable> store = new ArrayList<VectorWritable>();
+		for(VectorWritable vector : value) {
+			VectorWritable v = new VectorWritable(vector.get());
+			store.add(v);
+			sum++;
+//			Iterator<VectorWritable> it = store.iterator();
+//			while(it.hasNext()) {
+//				Iterator<Vector.Element> iterator = it.next().get().iterateNonZero();
+//				Vector.Element elem = iterator.next();
+//				log.info("itemlist:" + String.valueOf(elem.index()) + " " + String.valueOf(elem.get()));
+//				
+//			}
+		}
+		for(VectorWritable vector : store) {			
 			Iterator<Vector.Element> iterator = vector.get().iterateNonZero();
 			Vector.Element elem = iterator.next();
 			int itemId = elem.index();
 			double count =  elem.get();
-			//double result = count/Math.log(1+sum);
-			double result = count;
-			log.info(String.valueOf(itemId));
-			log.info(String.valueOf(result));
+			double result = count/Math.log(1+sum);
+//			double result = count;
+//			log.info(String.valueOf(itemId));
+//			log.info(String.valueOf(result));
+//			log.info(String.valueOf(itemId)+" "+String.valueOf(result));
 			//double result = count;
 			resultvector.set(itemId, result);
 

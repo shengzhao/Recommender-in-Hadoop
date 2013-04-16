@@ -29,9 +29,9 @@ public final class ItemTagCountReducer extends Reducer<VectorWritable, VarIntWri
 		Vector.Element elem = iterator.next();
 		int itemId = elem.index();
 		int tagId = (int) elem.get();
-		log.info(String.valueOf(itemId));
-		log.info(String.valueOf(tagId));
-		log.info(String.valueOf(sum));
+//		log.info(String.valueOf(itemId));
+//		log.info(String.valueOf(tagId));
+//		log.info(String.valueOf(sum));
 		vector.set(itemId, sum);
 		tag.set(tagId);
 		VectorWritable vw = new VectorWritable(vector);

@@ -20,7 +20,6 @@ public final class MergeAndMutipleReducer extends Reducer<VarIntWritable, PrefAn
 	protected void Reduce(VarIntWritable key, Iterable<PrefAndSimilarityColumnWritable> values, Context context) throws IOException, InterruptedException {
 		List<Vector> listItem = new ArrayList<Vector>();
 		List<Vector> listUser = new ArrayList<Vector>();
-		
 		float sig = -1;
 		for (PrefAndSimilarityColumnWritable prefAndSimilarityColumn : values) {
 			 Vector vector = new RandomAccessSparseVector(Integer.MAX_VALUE, 1);

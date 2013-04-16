@@ -23,8 +23,7 @@ public class UserItemNullReducer extends Reducer<VectorWritable, VarIntWritable,
 		varw.set(elem.index());
 		VectorWritable vw = new VectorWritable(vector);
 		vw.setWritesLaxPrecision(true);
-		log.info(String.valueOf(elem.get()));
-		log.info(String.valueOf(elem.index()));
+//		log.info(String.valueOf(varw.get())+" "+String.valueOf(elem.get()));
 		context.write(varw, vw);
 	}
 }

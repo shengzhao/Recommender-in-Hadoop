@@ -24,6 +24,7 @@ public final class UserTagCountMapper extends Mapper<LongWritable,Text, VectorWr
 	protected void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
 		//log.info("map1");
 		String[] tokens = UserTagCountMapper.DELIMITER.split(value.toString());
+		log.info(tokens.toString());
 		int userId = Integer.parseInt(tokens[0]);
 		int tagId = Integer.parseInt(tokens[2]);
 		Vector vector = new RandomAccessSparseVector(Integer.MAX_VALUE, 10);

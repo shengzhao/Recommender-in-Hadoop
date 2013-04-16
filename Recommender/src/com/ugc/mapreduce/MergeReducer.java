@@ -18,13 +18,40 @@ public class MergeReducer extends Reducer<VarIntWritable, VectorOrVectorWritable
 	protected void reduce(VarIntWritable key, Iterable<VectorOrVectorWritable> values, Context context) throws IOException, InterruptedException {
 		Vector user = new RandomAccessSparseVector(Integer.MAX_VALUE, 1000);
 		Vector item = new RandomAccessSparseVector(Integer.MAX_VALUE, 1000);
+		
 		for(VectorOrVectorWritable vv : values) {
 			
 			int sig = vv.getSig();
 			if(sig == 0)
-				user.assign(vv.getUserVector());
+			{
+
+				Iterator<Vector.Element> it = vv.getUserVector().iterateNonZero();
+				while(it.hasNext())
+				{
+					Vector.Element elem = it.next();
+					int userId = elem.index();
+					double count = elem.get();
+					user.set(userId, count);
+//					log.info("user:"+String.valueOf(userId)+" "+String.valueOf(count));
+				}
+				
+//				user.assign(vv.getUserVector());
+			}
 			else if(sig == 1)
-				item.assign(vv.getItemVector());
+			{
+//				Vector temp = new RandomAccessSparseVector(Integer.MAX_VALUE, 1);
+//				temp = vv.getItemVector();
+				Iterator<Vector.Element> it = vv.getItemVector().iterateNonZero();
+				while(it.hasNext())
+				{
+					Vector.Element elem = it.next();
+					int itemId = elem.index();
+					double count = elem.get();
+					item.set(itemId, count);
+//					log.info("item:"+String.valueOf(itemId)+" "+String.valueOf(count));
+				}
+			}
+//				item.assign(vv.getItemVector());
 			
 		}
 //		if(item.size() == 0)
@@ -37,20 +64,17 @@ public class MergeReducer extends Reducer<VarIntWritable, VectorOrVectorWritable
 			log.info("test");
 			user.assign(usertmp);
 		}
-		Iterator<Vector.Element> iterator = user.iterateNonZero();
-		while(iterator.hasNext()){
-			Vector.Element elem = iterator.next();
-			log.info(String.valueOf(elem.index()));
-			log.info(String.valueOf(elem.get()));
-			log.info("user");
-		}
-		Iterator<Vector.Element> iterator1 = item.iterateNonZero();
-		while(iterator1.hasNext()){
-			Vector.Element elem1 = iterator1.next();
-			log.info(String.valueOf(elem1.index()));
-			log.info(String.valueOf(elem1.get()));
-			log.info("item");
-		}
+//		log.info(String.valueOf(key.get()));
+//		Iterator<Vector.Element> iterator = user.iterateNonZero();
+//		while(iterator.hasNext()){
+//			Vector.Element elem = iterator.next();
+//			log.info(String.valueOf(elem.index())+" "+String.valueOf(elem.get()));
+//		}
+//		Iterator<Vector.Element> iterator1 = item.iterateNonZero();
+//		while(iterator1.hasNext()){
+//			Vector.Element elem1 = iterator1.next();
+//			log.info(String.valueOf(elem1.index())+" "+String.valueOf(elem1.get()));
+//		}
 		VectorAndVectorWritable vav = new VectorAndVectorWritable(user, item);
 //		Iterator<Vector.Element> iterator = user.iterateNonZero();
 //		while(iterator.hasNext()){

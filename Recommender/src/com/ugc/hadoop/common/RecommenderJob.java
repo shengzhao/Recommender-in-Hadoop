@@ -9,6 +9,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 
+import org.apache.hadoop.io.DoubleWritable;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
@@ -59,6 +60,7 @@ public final class RecommenderJob {
 
 
 	public static void main(String[] args) throws Exception {
+		PropertyConfigurator.configure("/home/hadoop/workspace/Recommender/src/com/ugc/hadoop/common/log4j.properties");
 		
 		log.error("main function");
 		Configuration conf = new Configuration();
@@ -79,8 +81,9 @@ public final class RecommenderJob {
 		
 	    
 	    Job job = new Job(conf, "job1");
-	    job.setJarByClass(UserTagCountReducer.class);
-		job.setMapperClass(UserTagCountMapper.class);
+	    //job.setJarByClass(RecommenderJob.class);
+		job.setJarByClass(UserTagCountReducer.class);
+	    job.setMapperClass(UserTagCountMapper.class);
 		job.setMapOutputKeyClass(VectorWritable.class);
 		job.setMapOutputValueClass(VarIntWritable.class);
 		job.setReducerClass(UserTagCountReducer.class);
@@ -89,11 +92,12 @@ public final class RecommenderJob {
 		FileInputFormat.addInputPath(job, inputPath);
 		FileOutputFormat.setOutputPath(job, userTagCountPath);
 		job.setOutputFormatClass(SequenceFileOutputFormat.class);
+//		job.setOutputFormatClass(SequenceOutputFormat.class);
 		job.waitForCompletion(true);
-		
-	
+////////		
+////////	
 		Job tagUserSum = new Job(conf, "job2");
-		tagUserSum.setJarByClass(RecommenderJob.class);
+		tagUserSum.setJarByClass(TagUserCountReducer.class);
 		tagUserSum.setInputFormatClass(SequenceFileInputFormat.class);
 		tagUserSum.setMapperClass(Mapper.class);
 		tagUserSum.setMapOutputKeyClass(VarIntWritable.class);
@@ -105,10 +109,10 @@ public final class RecommenderJob {
 		FileInputFormat.addInputPath(tagUserSum, userTagCountPath);
 		FileOutputFormat.setOutputPath(tagUserSum, tagUserSumPath);
 		tagUserSum.waitForCompletion(true);
-
-//		
+////////////
+//////////////		
 		Job itemTagCount = new Job(conf, "job3");
-		itemTagCount.setJarByClass(RecommenderJob.class);
+		itemTagCount.setJarByClass(ItemTagCountReducer.class);
 		itemTagCount.setInputFormatClass(TextInputFormat.class);
 		itemTagCount.setMapperClass(ItemTagCountMapper.class);
 		itemTagCount.setMapOutputKeyClass(VectorWritable.class);
@@ -120,10 +124,10 @@ public final class RecommenderJob {
 		FileInputFormat.addInputPath(itemTagCount, inputPath);
 		FileOutputFormat.setOutputPath(itemTagCount, itemTagCountPath);
 		itemTagCount.waitForCompletion(true);
-		
-
+////////////		
+//////////////
 		Job tagItemSum = new Job(conf, "job4");
-		tagItemSum.setJarByClass(RecommenderJob.class);
+		tagItemSum.setJarByClass(TagItemCountReducer.class);
 		tagItemSum.setInputFormatClass(SequenceFileInputFormat.class);
 		tagItemSum.setMapperClass(Mapper.class);
 		tagItemSum.setMapOutputKeyClass(VarIntWritable.class);
@@ -135,12 +139,12 @@ public final class RecommenderJob {
 		FileInputFormat.addInputPath(tagItemSum, itemTagCountPath);
 		FileOutputFormat.setOutputPath(tagItemSum, tagItemSumPath);
 		tagItemSum.waitForCompletion(true);
-		//System.exit(tagItemSum.waitForCompletion(true) ? 0 : 1);
-//		
-//		
+////
+//////////		
+//////////		
 		log.error("Merge");
 		Job mergeAndMutiple = new Job(conf, "job5");
-		mergeAndMutiple.setJarByClass(RecommenderJob.class);
+		mergeAndMutiple.setJarByClass(MergeReducer.class);
 		mergeAndMutiple.setInputFormatClass(SequenceFileInputFormat.class);
 		mergeAndMutiple.setMapperClass(Mapper.class);
 		mergeAndMutiple.setMapOutputKeyClass(VarIntWritable.class);
@@ -157,30 +161,30 @@ public final class RecommenderJob {
 	      tagUserSumPath = tagUserSumPath.makeQualified(fs);
 	      FileInputFormat.setInputPaths(mergeAndMutiple, tagUserSumPath, tagItemSumPath);
 		mergeAndMutiple.waitForCompletion(true);
-		//System.exit(mergeAndMutiple.waitForCompletion(true) ? 0 : 1);
-		
+//////		//System.exit(mergeAndMutiple.waitForCompletion(true) ? 0 : 1);
+////////		
 		log.error("Mutiple");
 		Job Mutiple = new Job(conf, "job6");
-		Mutiple.setJarByClass(RecommenderJob.class);
+		Mutiple.setJarByClass(MutipleMapper.class);
 		Mutiple.setInputFormatClass(SequenceFileInputFormat.class);
 		Mutiple.setMapperClass(MutipleMapper.class);
 		Mutiple.setMapOutputKeyClass(VectorWritable.class);
-		Mutiple.setMapOutputValueClass(VarIntWritable.class);
+		Mutiple.setMapOutputValueClass(DoubleWritable.class);
 		Mutiple.setReducerClass(Reducer.class);
 		Mutiple.setOutputKeyClass(VectorWritable.class);
-		Mutiple.setOutputValueClass(VarIntWritable.class);
+		Mutiple.setOutputValueClass(DoubleWritable.class);
 		Mutiple.setOutputFormatClass(SequenceFileOutputFormat.class);
 		FileInputFormat.addInputPath(Mutiple, mergeAndMutiplePath);
 		FileOutputFormat.setOutputPath(Mutiple, mutiplePath);
-		
+	
 		Mutiple.waitForCompletion(true);
-//
+//////////
 		Job userItemValue = new Job(conf, "job7");
-		userItemValue.setJarByClass(RecommenderJob.class);
+		userItemValue.setJarByClass(UserItemValueReducer.class);
 		userItemValue.setInputFormatClass(SequenceFileInputFormat.class);
 		userItemValue.setMapperClass(Mapper.class);
 		userItemValue.setMapOutputKeyClass(VectorWritable.class);
-		userItemValue.setMapOutputValueClass(VarIntWritable.class);
+		userItemValue.setMapOutputValueClass(DoubleWritable.class);
 		userItemValue.setReducerClass(UserItemValueReducer.class);
 		userItemValue.setOutputKeyClass(VarIntWritable.class);
 		userItemValue.setOutputValueClass(VectorWritable.class);
@@ -189,9 +193,9 @@ public final class RecommenderJob {
 		FileOutputFormat.setOutputPath(userItemValue, userItemValuePath);
 		//FileOutputFormat.setOutputPath(userItemValue, outputPath);
 		userItemValue.waitForCompletion(true);
-////		
+//////////		
 		Job userItemNull = new Job(conf, "job8");
-		userItemNull.setJarByClass(RecommenderJob.class);
+		userItemNull.setJarByClass(UserItemNullReducer.class);
 		userItemNull.setInputFormatClass(TextInputFormat.class);
 		userItemNull.setMapperClass(UserItemNullMapper.class);
 		userItemNull.setMapOutputKeyClass(VectorWritable.class);
@@ -204,10 +208,10 @@ public final class RecommenderJob {
 		FileOutputFormat.setOutputPath(userItemNull, userItemNullPath);
 		//FileOutputFormat.setOutputPath(userItemNull, outputPath);
 		userItemNull.waitForCompletion(true);
-		
+//////		
 		log.info("toRecommendation");
 		Job toRecommendation = new Job(conf, "job9");
-		toRecommendation.setJarByClass(RecommenderJob.class);
+		toRecommendation.setJarByClass(ToRecommendationReducer.class);
 		toRecommendation.setInputFormatClass(SequenceFileInputFormat.class);
 		toRecommendation.setMapperClass(Mapper.class);
 		toRecommendation.setMapOutputKeyClass(VarIntWritable.class);
@@ -225,29 +229,29 @@ public final class RecommenderJob {
 	      FileInputFormat.setInputPaths(toRecommendation, userItemValuePath, userItemNullPath);
 		
 		toRecommendation.waitForCompletion(true);	   
-
-
-
-
-//	    if (shouldRunNextPhase(parsedArgs, currentPhase)) {
-//	    	Job toRecommendation = prepareJob(
-//	    			new Path(userItemValuePath + "," + userItemNullPath),
-//	    			outputPath,
-//	    			SequenceFileInputFormat.class,
-//	    			Mapper.class,
-//	    			VarIntWritable.class,
-//	    			VectorWritable.class,
-//	    			ToRecommendationReducer.class,
-//	    			VarIntWritable.class,
-//	    			RecommendedItemsWritable.class,
-//	    			TextOutputFormat.class
-//	    			);
-//	    	Configuration toRecommendationConf = toRecommendation.getConfiguration();
-//	        FileSystem fs = FileSystem.get(tempDirPath.toUri(), toRecommendationConf);
-//	        userItemValuePath = userItemValuePath.makeQualified(fs);
-//	        userItemNullPath = userItemNullPath.makeQualified(fs);
-//	        FileInputFormat.setInputPaths(toRecommendation, userItemValuePath, userItemNullPath);
-//	    	toRecommendation.waitForCompletion(true);
+//
+//
+//
+//
+////	    if (shouldRunNextPhase(parsedArgs, currentPhase)) {
+////	    	Job toRecommendation = prepareJob(
+////	    			new Path(userItemValuePath + "," + userItemNullPath),
+////	    			outputPath,
+////	    			SequenceFileInputFormat.class,
+////	    			Mapper.class,
+////	    			VarIntWritable.class,
+////	    			VectorWritable.class,
+////	    			ToRecommendationReducer.class,
+////	    			VarIntWritable.class,
+////	    			RecommendedItemsWritable.class,
+////	    			TextOutputFormat.class
+////	    			);
+////	    	Configuration toRecommendationConf = toRecommendation.getConfiguration();
+////	        FileSystem fs = FileSystem.get(tempDirPath.toUri(), toRecommendationConf);
+////	        userItemValuePath = userItemValuePath.makeQualified(fs);
+////	        userItemNullPath = userItemNullPath.makeQualified(fs);
+////	        FileInputFormat.setInputPaths(toRecommendation, userItemValuePath, userItemNullPath);
+////	    	toRecommendation.waitForCompletion(true);
 	}
 
 	

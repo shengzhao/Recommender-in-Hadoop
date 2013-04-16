@@ -28,7 +28,7 @@ public final class ItemTagCountMapper extends Mapper<LongWritable, Text, VectorW
 		vector.set(itemId, tagId);
 		VectorWritable vw = new VectorWritable(vector);
 		vw.setWritesLaxPrecision(true);
-		log.info("map 3");
+//		log.info("map 3");
 		context.write(vw, one);
 	}
 }
